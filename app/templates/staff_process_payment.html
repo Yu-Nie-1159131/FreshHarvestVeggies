@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Payment</title>
+    <style>
+        /* General Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            padding: 40px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            font-size: 1rem;
+            color: #34495e;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        select, input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: background-color 0.3s ease-in-out;
+            text-transform: uppercase;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Form section styles for card selection */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Process Payment</h1>
+
+        <form action="/staff/process_payment/{{ order.id }}" method="POST">
+            <label for="payment_method">Select Payment Method:</label>
+            <select id="payment_method" name="payment_method" onchange="togglePaymentFields()">
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Account Payment" selected>Account Payment</option>
+            </select>
+        
+            <!-- Credit Card Fields -->
+            <div id="credit_card_fields" class="hidden">
+                <label for="card_type">Card Type:</label>
+                <input type="text" id="card_type" name="card_type" placeholder="VISA / Mastercard">
+                
+                <label for="expiry_date">Expiry Date:</label>
+                <input type="date" id="expiry_date" name="expiry_date"> <!-- 日期选择器 -->
+            </div>
+        
+            <!-- Debit Card Fields -->
+            <div id="debit_card_fields" class="hidden">
+                <label for="debit_card_number">Debit Card Number:</label>
+                <input type="text" id="debit_card_number" name="debit_card_number">
+                
+                <label for="bank_name">Bank Name:</label>
+                <input type="text" id="bank_name" name="bank_name">
+            </div>
+        
+            <!-- Submit Button -->
+            <div class="btn-container">
+                <button type="submit" class="btn">Submit Payment</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function togglePaymentFields() {
+            var method = document.getElementById('payment_method').value;
+            document.getElementById('credit_card_fields').classList.toggle('hidden', method !== 'Credit Card');
+            document.getElementById('debit_card_fields').classList.toggle('hidden', method !== 'Debit Card');
+        }
+    </script>
+</body>
+</html>

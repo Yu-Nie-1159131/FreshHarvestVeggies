@@ -145,6 +145,13 @@
                     </form>
                 </p>
 
+                <!-- the Payment button -->
+                <p>
+                    <form action="/staff/payment/{{ order_data['order'].id }}" method="GET">
+                        <button type="submit" class="btn">Payment</button>
+                    </form>
+                </p>
+
                 <h3>Items:</h3>
                 <ul>
                     {% for item in order_data['items'] %}

@@ -95,7 +95,7 @@ class OrderItem(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id'))
     product_id = db.Column(db.Integer, db.ForeignKey('item.id'))
     quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Float, nullable=False)  # 每项产品的单价
+    price = db.Column(db.Float, nullable=False)  
     order = db.relationship('Order', back_populates='order_items')
     product = db.relationship('Item')
 

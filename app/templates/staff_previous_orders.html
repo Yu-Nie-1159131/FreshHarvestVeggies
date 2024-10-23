@@ -112,7 +112,7 @@
                     {% endfor %}
                 </ul>
             </td>
-            <td>${{ order.total_amount }}</td>
+            <td>${{ '%.2f' % order.total_amount }}</td> <!-- Displaying total amount with 2 decimal places -->
         </tr>
         {% endfor %}
     </table>

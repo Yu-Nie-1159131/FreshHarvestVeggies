@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Order</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Create New Order</h1>
+        <form id="order-form" action="/staff/submit_order" method="POST">
+            <!-- Customer Selection -->
+            <div class="form-group">
+                <label for="customer">Customer</label>
+                <select id="customer" name="customer_id" class="form-control">
+                    {% for customer in customers %}
+                        <option value="{{ customer.id }}">{{ customer.first_name }} {{ customer.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Pack Veggies Selection -->
+            <h2 class="mt-4">Pack Veggies</h2>
+            <ul>
+                {% for veggie in pack_veggies %}
+                    <li>
+                        <strong>{{ veggie.veg_name }}</strong> - Price per pack: ${{ veggie.price_per_pack }} - Number of packs: {{ veggie.num_of_packs }}
+                        <br>
+                        <label for="pack_veggie_{{ veggie.id }}">Quantity:</label>
+                        <input type="number" name="items[pack_veggie_{{ veggie.id }}][quantity]" class="form-control" min="0" value="0">
+                        <input type="hidden" name="items[pack_veggie_{{ veggie.id }}][product_id]" value="{{ veggie.id }}">
+                        <input type="hidden" name="items[pack_veggie_{{ veggie.id }}][type]" value="pack_veggie">
+                    </li>
+                {% else %}
+                    <li>No Pack Veggies available.</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Unit Price Veggies Selection -->
+            <h2 class="mt-4">Unit Price Veggies</h2>
+            <ul>
+                {% for veggie in unit_price_veggies %}
+                    <li>
+                        <strong>{{ veggie.description }}</strong> - Price per unit: ${{ veggie.price_per_unit }} - Quantity: {{ veggie.quantity }}
+                        <br>
+                        <label for="unit_price_veggie_{{ veggie.id }}">Quantity:</label>
+                        <input type="number" name="items[unit_price_veggie_{{ veggie.id }}][quantity]" class="form-control" min="0" value="0">
+                        <input type="hidden" name="items[unit_price_veggie_{{ veggie.id }}][product_id]" value="{{ veggie.id }}">
+                        <input type="hidden" name="items[unit_price_veggie_{{ veggie.id }}][type]" value="unit_price_veggie">
+                    </li>
+                {% else %}
+                    <li>No Unit Price Veggies available.</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Weighted Veggies Selection -->
+            <h2 class="mt-4">Weighted Veggies</h2>
+            <ul>
+                {% for veggie in weight_veggies %}
+                    <li>
+                        <strong>{{ veggie.description }}</strong> - Actual Weight: {{ veggie.weight }} kg
+                        <br>
+                        <label for="weighted_veggie_{{ veggie.id }}">Quantity (kg):</label>
+                        <input type="number" name="items[weighted_veggie_{{ veggie.id }}][quantity]" class="form-control" step="0.1" min="0" value="0">
+                        <input type="hidden" name="items[weighted_veggie_{{ veggie.id }}][product_id]" value="{{ veggie.id }}">
+                        <input type="hidden" name="items[weighted_veggie_{{ veggie.id }}][type]" value="weighted_veggie">
+                    </li>
+                {% else %}
+                    <li>No Weighted Veggies available.</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Premade Boxes Selection -->
+            <h2 class="mt-4">Available Premade Boxes</h2>
+            <ul>
+                {% for box in premade_boxes %}
+                    <li>
+                        {{ box.description }} - Price: ${{ box.price }} NZD (Box Size: {{ box.box_size }} - Number of Boxes: {{ box.num_of_boxes }})
+                        <br>
+                        <label for="box_{{ box.id }}">Quantity:</label>
+                        <input type="number" name="items[premade_box_{{ box.id }}][quantity]" class="form-control" min="0" value="0">
+                        <input type="hidden" name="items[premade_box_{{ box.id }}][product_id]" value="{{ box.id }}">
+                        <input type="hidden" name="items[premade_box_{{ box.id }}][type]" value="premade_box">
+                    </li>
+                {% else %}
+                    <li>No available premade boxes at the moment.</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary mt-4">Checkout</button>
+        </form>
+    </div>
+</body>
+</html>
