@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, session, jsonify,url_for
+from flask import Blueprint, render_template, request, redirect, session, jsonify,url_for,flash
 from .. import db
 from ..models import Staff, WeightedVeggie, UnitPriceVeggie, PackVeggie,PremadeBox, Order, Customer,OrderItem,Item,Order
 from datetime import datetime, timedelta
@@ -90,11 +90,6 @@ def view_all_current_orders():
 
     return render_template('staff_current_orders.html', orders_with_items=orders_with_items)
 
-    
-    # Render a template to display the orders and their details
-    return render_template('staff_current_orders.html', orders_with_items=orders_with_items)
-
-
 # 4. View all previous orders
 @staff_bp.route('/staff/previous_orders', methods=['GET'])
 def view_all_previous_orders():
@@ -102,27 +97,26 @@ def view_all_previous_orders():
     
     # Calculate the total amount of each order
     for order in previous_orders:
-        order.total_amount = sum(item.price * item.quantity for item in order.items)
+        order.total_amount = sum(item.price * item.quantity for item in order.order_items)
     
     return render_template('staff_previous_orders.html', previous_orders=previous_orders)
 
 # 5. Update order status
 @staff_bp.route('/staff/update_order_status/<int:order_id>', methods=['POST'])
 def update_order_status(order_id):
-    order = Order.query.get(order_id)
+    order = Order.query.get_or_404(order_id)
+    new_status = request.form.get('status')
+
+    if new_status not in ['Pending', 'Completed', 'Cancelled']:
+        flash('Invalid status selected.', 'error')
+        return redirect(url_for('staff_bp.view_all_current_orders'))
+
+    # Update the order status
+    order.status = new_status
+    db.session.commit()
     
-    if not order:
-        return jsonify({'error': 'Order not found'}), 404
-
-    data = request.get_json()
-    new_status = data.get('status')
-
-    if new_status:
-        order.status = new_status
-        db.session.commit()
-        return jsonify({'message': 'Order status updated successfully!'}), 200
-    else:
-        return jsonify({'error': 'No status provided'}), 400
+    flash(f'Order {order_id} status updated to {new_status}.', 'success')
+    return redirect(url_for('staff_bp.view_all_current_orders'))
 
 # 6. View all customers 
 @staff_bp.route('/staff/customers', methods=['GET'])

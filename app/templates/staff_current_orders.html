@@ -79,19 +79,24 @@
             color: #2c3e50;
         }
 
+        select {
+            padding: 5px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
         .btn {
             display: inline-block;
-            padding: 8px 15px;  /* Adjusted padding */
+            padding: 8px 15px;
             background-color: #3498db;
             color: white;
             text-decoration: none;
-            border-radius: 5px; /* Slightly reduced border radius */
+            border-radius: 5px;
             text-align: center;
-            font-size: 1rem;    /* Adjusted font size */
+            font-size: 1rem;
             margin-top: 20px;
             transition: background-color 0.3s ease-in-out;
-            width: auto;        /* Set width to auto for normal size */
-            max-width: none;    /* Remove max-width restriction */
             text-transform: uppercase;
         }
 
@@ -127,8 +132,18 @@
                 <p><strong>Customer ID:</strong> {{ order_data['order'].customer_id }}</p>
                 <p><strong>Customer Name:</strong> {{ order_data['customer_name'] }}</p> <!-- Display customer name -->
                 <p><strong>Order Date:</strong> {{ order_data['order'].order_date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-                <p><strong>Status:</strong> {{ order_data['order'].status }}</p>
-                <p><strong>Total Amount:</strong> ${{ order_data['order'].total_amount }}</p>
+                
+                <!-- Select for order status -->
+                <p><strong>Status:</strong>
+                    <form action="/staff/update_order_status/{{ order_data['order'].id }}" method="POST">
+                        <select name="status">
+                            <option value="Pending" {% if order_data['order'].status == 'Pending' %}selected{% endif %}>Pending</option>
+                            <option value="Completed" {% if order_data['order'].status == 'Completed' %}selected{% endif %}>Completed</option>
+                            <option value="Cancelled" {% if order_data['order'].status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                        <button type="submit" class="btn">Update Status</button>
+                    </form>
+                </p>
 
                 <h3>Items:</h3>
                 <ul>
