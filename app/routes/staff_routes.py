@@ -81,7 +81,7 @@ def view_all_current_orders():
         for order_item in order.order_items:
             item_data = {
                 'product_id': order_item.product_id,
-                'description': order_item.product.description,  # Assuming the product has a description
+                'description': order_item.product.description,  # description of product
                 'quantity': order_item.quantity,
                 'price': order_item.price
             }
