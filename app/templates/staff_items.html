@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Items List</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1rem;
+            margin: 20px auto;
+            transition: background-color 0.3s ease-in-out;
+            max-width: 200px;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>All Items</h1>
+
+    <h2>Weighted Veggies</h2>
+    <table>
+        <tr>
+            <th>Description</th>
+            <th>Weight (kg)</th>
+        </tr>
+        {% for veggie in weighted_veggies %}
+        <tr>
+            <td>{{ veggie.description }}</td>
+            <td>{{ veggie.weight }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Unit Price Veggies</h2>
+    <table>
+        <tr>
+            <th>Description</th>
+            <th>Price per Unit (USD)</th>
+            <th>Quantity</th>
+        </tr>
+        {% for veggie in unit_price_veggies %}
+        <tr>
+            <td>{{ veggie.description }}</td>
+            <td>{{ veggie.price_per_unit }}</td>
+            <td>{{ veggie.quantity }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Pack Veggies</h2>
+    <table>
+        <tr>
+            <th>Description</th>
+            <th>Price per Pack (USD)</th>
+            <th>Number of Packs</th>
+            <th>Veg Name</th>
+        </tr>
+        {% for veggie in pack_veggies %}
+        <tr>
+            <td>{{ veggie.description }}</td>
+            <td>{{ veggie.price_per_pack }}</td>
+            <td>{{ veggie.num_of_packs }}</td>
+            <td>{{ veggie.veg_name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Premade Boxes</h2>
+    <table>
+        <tr>
+            <th>Description</th>
+            <th>Price (USD)</th>
+            <th>Box Size</th>
+            <th>Number of Boxes</th>
+        </tr>
+        {% for box in premade_boxes %}
+        <tr>
+            <td>{{ box.description }}</td>
+            <td>{{ box.price }}</td>
+            <td>{{ box.box_size }}</td>
+            <td>{{ box.num_of_boxes }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div style="text-align: center;">
+        <a href="/staff/dashboard" class="btn">Back to Dashboard</a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Order Details</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to external CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #333;
+        }
+
+        .order-details {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .order-info {
+            margin-bottom: 20px;
+        }
+
+        .order-info p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        h3 {
+            color: #555;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #e9ecef;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 10px; /* Space between buttons */
+        }
+
+        button:hover {
+            background-color: #c82333;
+        }
+
+        .message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            background-color: #007bff; /* Blue color for the back button */
+        }
+
+        .back-button:hover {
+            background-color: #0069d9; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>Current Order Details</h1>
+
+    {% if message %}
+        <div class="message">
+            <p>{{ message }}</p>
+        </div>
+    {% else %}
+        <div class="order-details">
+            <div class="order-info">
+                <h2>Order ID: {{ order.id }}</h2>
+                <p>Order Date: {{ order.order_date }}</p>
+                <p>Total Amount: ${{ order.total_amount }}</p>
+            </div>
+            <h3>Items:</h3>
+            <ul>
+                {% for order_item, item in items %}
+                    <li>
+                        Product ID: {{ order_item.product_id }}, 
+                        Description: {{ item.description }}, 
+                        Quantity: {{ order_item.quantity }}, 
+                        Price: ${{ order_item.price }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <form method="POST" action="/current_order">
+            <button type="submit">Cancel Order</button>
+        </form>
+
+        <!-- Back to Home button -->
+        <form method="GET" action="/dashboard"> <!-- Update this action to your dashboard route -->
+            <button type="submit" class="back-button">Back to Home</button>
+        </form>
+    {% endif %}
+</body>
+</html>

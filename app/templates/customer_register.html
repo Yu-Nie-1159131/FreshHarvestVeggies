@@ -1,0 +1,130 @@
+<!-- templates/register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .register-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+        }
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-control {
+            margin-bottom: 15px;
+        }
+        .corporate-fields {
+            display: none;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="register-container">
+        <div class="register-header">
+            <h2 class="mb-3"><i class="fas fa-user-plus"></i> Register</h2>
+        </div>
+        
+        <form method="POST">
+            <!-- Username -->
+            <div class="form-group">
+                <label for="username"><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required>
+            </div>
+            
+            <!-- First Name -->
+            <div class="form-group">
+                <label for="first_name"><i class="fas fa-id-card"></i> First Name</label>
+                <input type="text" id="first_name" name="first_name" class="form-control" placeholder="Enter your first name" required>
+            </div>
+            
+            <!-- Last Name -->
+            <div class="form-group">
+                <label for="last_name"><i class="fas fa-id-card-alt"></i> Last Name</label>
+                <input type="text" id="last_name" name="last_name" class="form-control" placeholder="Enter your last name" required>
+            </div>
+    
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+    
+            <!-- Address -->
+            <div class="form-group">
+                <label for="address"><i class="fas fa-map-marker-alt"></i> Address</label>
+                <input type="text" id="address" name="address" class="form-control" placeholder="Enter your address" required>
+            </div>
+    
+            <!-- Max Owing -->
+            <div class="form-group">
+                <label for="max_owing"><i class="fas fa-money-bill-wave"></i> Max Owing</label>
+                <input type="number" step="0.01" id="max_owing" name="max_owing" class="form-control" placeholder="Enter max owing amount" required>
+            </div>
+    
+            <!-- Customer Type -->
+            <div class="form-group">
+                <label for="customer_type"><i class="fas fa-users"></i> Customer Type</label>
+                <select name="customer_type" id="customer_type" class="form-control" required>
+                    <option value="private">Private Customer</option>
+                    <option value="corporate">Corporate Customer</option>
+                </select>
+            </div>
+    
+            <!-- Corporate Customer Fields -->
+            <div id="corporate_fields" class="corporate-fields">
+                <div class="form-group">
+                    <label for="min_balance"><i class="fas fa-balance-scale"></i> Minimum Balance</label>
+                    <input type="number" step="0.01" id="min_balance" name="min_balance" class="form-control" placeholder="Enter minimum balance">
+                </div>
+    
+                <div class="form-group">
+                    <label for="max_credit"><i class="fas fa-credit-card"></i> Max Credit</label>
+                    <input type="number" step="0.01" id="max_credit" name="max_credit" class="form-control" placeholder="Enter max credit limit">
+                </div>
+            </div>
+    
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary"><i class="fas fa-user-plus"></i> Register</button>
+        </form>
+    </div>
+    
+    <!-- JavaScript to toggle corporate fields -->
+    <script>
+        const customerTypeSelect = document.getElementById('customer_type');
+        const corporateFields = document.getElementById('corporate_fields');
+        
+        customerTypeSelect.addEventListener('change', function() {
+            if (this.value === 'corporate') {
+                corporateFields.style.display = 'block';
+            } else {
+                corporateFields.style.display = 'none';
+            }
+        });
+    </script>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-qzAwlUAVodM0yjR92mnA3jEDnexltpUrnq/cf9wkcZDnItpJhnHR7HKCPLGxijN7" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-Qvt5S0Qd1/0HX8tyYcDrLgxPzfsx4PWnmec7Z+De0LdYLtCsPfhoZ5TWv/Ir8zxT" crossorigin="anonymous"></script>
+</body>
+</html>

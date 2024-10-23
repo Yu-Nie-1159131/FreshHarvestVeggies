@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previous Orders</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        ul li:last-child {
+            border-bottom: none;
+        }
+
+        .no-orders {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1rem;
+            margin: 20px auto;
+            transition: background-color 0.3s ease-in-out;
+            max-width: 200px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Previous Orders</h1>
+    
+    {% if previous_orders %}
+    <table>
+        <tr>
+            <th>Order ID</th>
+            <th>Order Date</th>
+            <th>Status</th>
+            <th>Items</th>
+            <th>Total Amount</th>
+        </tr>
+        {% for order in previous_orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M:%S') }}</td> <!-- Formatted date -->
+            <td>{{ order.status }}</td>
+            <td>
+                <ul>
+                    {% for item in order.items %}
+                    <li>Product ID: {{ item.product_id }} - Quantity: {{ item.quantity }} - Price: ${{ item.price }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>${{ order.total_amount }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="no-orders">No previous orders.</p>
+    {% endif %}
+
+    <div style="text-align: center;">
+        <a href="/staff/dashboard" class="btn">Back to Dashboard</a>
+    </div>
+
+</body>
+</html>

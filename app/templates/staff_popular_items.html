@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Most Popular Items</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 修改字体为更高级的样式 */
+        }
+        h1 {
+            color: #343a40;
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+        table {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            font-family: 'Arial', sans-serif; 
+        }
+        th {
+            background-color: #007bff; 
+            color: black; 
+            font-weight: bold; 
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .back-button {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Most Popular Items</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item Description</th>
+                <th>Total Sold</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in popular_items %}
+            <tr>
+                <td>{{ item.description }}</td>
+                <td>{{ item.total_quantity }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="back-button">
+        <a href="/staff/dashboard" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Order Page</h1>
+
+    <h2>Select Pack Veggies</h2>
+    <div id="pack-veggies">
+        <ul>
+            {% for veggie in pack_veggies %}
+                <li>
+                    <strong>{{ veggie.veg_name }}</strong> - Price per pack: ${{ veggie.price_per_pack }}
+                    <input type="number" min="1" value="1" class="quantity" data-type="pack_veggie" data-id="{{ veggie.id }}">
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <h2>Select Unit Price Veggies</h2>
+    <div id="unit-price-veggies">
+        <ul>
+            {% for veggie in unit_price_veggies %}
+                <li>
+                    <strong>{{ veggie.description }}</strong> - Price per unit: ${{ veggie.price_per_unit }}
+                    <input type="number" min="1" value="1" class="quantity" data-type="unit_price_veggie" data-id="{{ veggie.id }}">
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <h2>Select Weighted Veggies</h2>
+    <div id="weighted-veggies">
+        <ul>
+            {% for veggie in weighted_veggies %}
+                <li>
+                    <strong>{{ veggie.description }}</strong> - Actual Weight: {{ veggie.weight }} kg
+                    <input type="number" min="1" value="1" class="quantity" data-type="weighted_veggie" data-id="{{ veggie.id }}">
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <h2>Payment Method</h2>
+    <select id="payment_method">
+        <option value="credit_card">Credit Card</option>
+        <option value="debit_card">Debit Card</option>
+    </select>
+
+    <div id="credit_card_info" class="payment_info">
+        <label>Card Type:</label><input type="text" id="card_type"><br>
+        <label>Expiry Date:</label><input type="text" id="expiry_date"><br>
+    </div>
+    
+    <div id="debit_card_info" class="payment_info" style="display: none;">
+        <label>Debit Card Number:</label><input type="text" id="debit_card_number"><br>
+        <label>Bank Name:</label><input type="text" id="bank_name"><br>
+    </div>
+
+    <button id="place_order">Place Order</button>
+
+    <script>
+        $(document).ready(function() {
+            $('#payment_method').change(function() {
+                if ($(this).val() == 'credit_card') {
+                    $('#credit_card_info').show();
+                    $('#debit_card_info').hide();
+                } else {
+                    $('#credit_card_info').hide();
+                    $('#debit_card_info').show();
+                }
+            });
+
+            $('#place_order').click(function() {
+                const items = [];
+                $('.quantity').each(function() {
+                    const quantity = $(this).val();
+                    if (quantity > 0) {
+                        items.push({
+                            product_id: $(this).data('id'),
+                            quantity: quantity,
+                            type: $(this).data('type')
+                        });
+                    }
+                });
+
+                const paymentMethod = $('#payment_method').val();
+                const orderData = {
+                    items: items,
+                    payment_method: paymentMethod
+                };
+
+                if (paymentMethod == 'credit_card') {
+                    orderData.card_type = $('#card_type').val();
+                    orderData.expiry_date = $('#expiry_date').val();
+                } else {
+                    orderData.debit_card_number = $('#debit_card_number').val();
+                    orderData.bank_name = $('#bank_name').val();
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/place_order',
+                    contentType: 'application/json',
+                    data: JSON.stringify(orderData),
+                    success: function(response) {
+                        alert(response.message);
+                    },
+                    error: function(error) {
+                        alert(error.responseJSON.error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

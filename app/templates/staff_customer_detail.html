@@ -1,0 +1,71 @@
+<!-- templates/customer_detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        h1, h2 {
+            color: #343a40;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .back-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Customer Details</h1>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2>{{ customer.firstName }} {{ customer.lastName }}</h2>
+                <p><strong>Address:</strong> {{ customer.custAddress }}</p>
+                <p><strong>Max Owing:</strong> ${{ customer.maxOwing }}</p>
+                <p><strong>Balance:</strong> ${{ customer.custBalance }}</p>
+            </div>
+        </div>
+
+        <h2>Previous Orders</h2>
+        {% if customer.listOfOrders %}
+            <div class="row">
+                {% for order in customer.listOfOrders %}
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Order ID: {{ order.order_id }}</h5>
+                                <p class="card-text"><strong>Order Date:</strong> {{ order.order_date }}</p>
+                                <p class="card-text"><strong>Status:</strong> {{ order.status }}</p>
+                                <p class="card-text"><strong>Total Amount:</strong> ${{ order.total_amount }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No previous orders found.</p>
+        {% endif %}
+        
+        <div class="back-button">
+            <a href="/staff/customers" class="btn btn-primary mt-3">Back to Customers List</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

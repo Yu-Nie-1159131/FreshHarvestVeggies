@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Orders</title>
+    <style>
+        /* General Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            padding: 40px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order {
+            border: 1px solid #e0e0e0;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fafafa;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .order:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .order h2 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        ul li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        ul li:last-child {
+            border-bottom: none;
+        }
+
+        strong {
+            color: #2c3e50;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;  /* Adjusted padding */
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px; /* Slightly reduced border radius */
+            text-align: center;
+            font-size: 1rem;    /* Adjusted font size */
+            margin-top: 20px;
+            transition: background-color 0.3s ease-in-out;
+            width: auto;        /* Set width to auto for normal size */
+            max-width: none;    /* Remove max-width restriction */
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .order {
+                padding: 15px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Current Orders</h1>
+
+        {% for order_data in orders_with_items %}
+            <div class="order">
+                <h2>Order ID: {{ order_data['order'].id }}</h2>
+                <p><strong>Customer ID:</strong> {{ order_data['order'].customer_id }}</p>
+                <p><strong>Customer Name:</strong> {{ order_data['customer_name'] }}</p> <!-- Display customer name -->
+                <p><strong>Order Date:</strong> {{ order_data['order'].order_date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                <p><strong>Status:</strong> {{ order_data['order'].status }}</p>
+                <p><strong>Total Amount:</strong> ${{ order_data['order'].total_amount }}</p>
+
+                <h3>Items:</h3>
+                <ul>
+                    {% for item in order_data['items'] %}
+                        <li>
+                            <strong>Product ID:</strong> {{ item.product_id }}<br>
+                            <strong>Description:</strong> {{ item.description }}<br>
+                            <strong>Quantity:</strong> {{ item.quantity }}<br>
+                            <strong>Price:</strong> ${{ item.price }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+
+        <div class="btn-container">
+            <a href="/staff/dashboard" class="btn">Back to Dashboard</a>
+        </div>
+    </div>
+
+</body>
+</html>

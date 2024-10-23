@@ -1,0 +1,61 @@
+<!-- templates/customer_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"> <!-- Google Font -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        h1 {
+            color: #343a40;
+        }
+        .list-group-item {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .list-group-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #e9ecef;
+        }
+        .customer-name {
+            font-family: 'Roboto', sans-serif; /* Applying the stylish font */
+            font-weight: 700; /* Bold weight for better emphasis */
+            font-size: 1.2rem; /* Slightly larger font size */
+            color: #2c3e50; /* Darker color for contrast */
+            transition: color 0.3s; /* Transition effect for hover */
+        }
+        .customer-name:hover {
+            color: #3498db; /* Change color on hover */
+        }
+        .back-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Customers List</h1>
+        <ul class="list-group">
+            {% for customer in customers %}
+            <li class="list-group-item">
+                <a href="{{ url_for('staff_bp.get_customer_details', customer_id=customer.custID) }}" class="text-decoration-none customer-name">
+                    {{ customer.firstName }} {{ customer.lastName }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="back-button">
+            <a href="/staff/dashboard" class="btn btn-primary mt-3">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
