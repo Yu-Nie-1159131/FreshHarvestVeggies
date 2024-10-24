@@ -101,6 +101,10 @@
     {% if message %}
         <div class="message">
             <p>{{ message }}</p>
+            <!-- Back to Home button -->
+           <form method="GET" action="/dashboard"> <!-- Update this action to your dashboard route -->
+            <button type="submit" class="back-button">Back to Home</button>
+           </form>
         </div>
     {% else %}
         <div class="order-details">
