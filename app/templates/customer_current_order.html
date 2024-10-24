@@ -131,7 +131,7 @@
         </form>
 
         <!-- Payment Button -->
-        <form method="POST" action="/processpayment">
+        <form method="GET" action="/process_payment/{{ order.id }}">
             <button type="submit" class="payment-button">Proceed to Payment</button>
         </form>
 

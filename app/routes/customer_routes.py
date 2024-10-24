@@ -130,8 +130,9 @@ def place_order():
         discount_rate = 1.0  # Default rate
 
         # Check customer type and process order restrictions
-        if isinstance(customer, CorporateCustomer):
-            if customer.min_balance < customer.max_credit:
+        co_Customer = db.session.query(CorporateCustomer).filter(CorporateCustomer.id == customer_id).first()
+        if co_Customer is not None:
+            if co_Customer.min_balance < co_Customer.max_credit:
                 flash('Your balance is lower than the allowed credit limit. Cannot place an order.', 'error')
                 return redirect(url_for('customer_bp.available_items'))
             discount_rate = 0.9  # 10% discount for corporate customers
@@ -213,18 +214,21 @@ def place_order():
 
 @customer_bp.route('/process_payment/<int:order_id>', methods=['GET', 'POST'])
 def process_payment(order_id):
+    # Check if the customer is logged in
     if 'customer_id' not in session:
         return redirect('/login')
 
-    # Get the current order
+    # Retrieve the current order by order ID
     order = Order.query.get(order_id)
     if not order:
         return "Order not found", 404
-    
+
+    # If the order is not found, redirect to available items
     if not order:
         flash('Order not found.', 'error')
         return redirect(url_for('customer_bp.available_items'))
 
+    # Handle the POST request when the form is submitted
     if request.method == 'POST':
         payment_method = request.form.get('payment_method')
 
@@ -232,6 +236,7 @@ def process_payment(order_id):
             payment = None
             total_amount = order.total_amount
 
+            # Handle credit card payment
             if payment_method == 'Credit Card':
                 payment = CreditCardPayment(
                     payment_date=datetime.now(),
@@ -240,6 +245,7 @@ def process_payment(order_id):
                     payment_type=payment_method,
                     card_expiry_date=request.form.get('expiry_date')
                 )
+            # Handle debit card payment
             elif payment_method == 'Debit Card':
                 payment = DebitCardPayment(
                     payment_date=datetime.now(),
@@ -248,21 +254,32 @@ def process_payment(order_id):
                     payment_type=payment_method,
                     bank_name=request.form.get('bank_name')
                 )
+            # Handle account payment
             elif payment_method == 'Account Payment':
                 customer = Customer.query.get(order.customer_id)
-                if customer.balance >= total_amount:
-                    customer.balance -= total_amount  # Deduct from account balance
-                    db.session.commit()  # Update balance
+                co_Customer = db.session.query(CorporateCustomer).filter(CorporateCustomer.id == order.customer_id).first()
+                if co_Customer is not None:  # Check if customer is a CorporateCustomer
+                    if co_Customer.min_balance  >=  co_Customer.max_credit:  # Check if balance is enough for CorporateCustomer
+                        co_Customer.min_balance -= total_amount  # Deduct from min_balance
+                    else:
+                        flash('Insufficient balance for Account Payment.', 'error')
+                        return redirect(url_for('customer_bp.process_payment', order_id=order_id))
                 else:
-                    flash('Insufficient balance for Account Payment.', 'error')
-                    return redirect(url_for('customer_bp.process_payment'))
+                    if customer.balance < -100:  # For regular customers, check if balance is below -100
+                        customer.balance -= total_amount  # Deduct from balance
+                        db.session.commit()  # Update balance in the database
+                    else:
+                        flash('Insufficient balance for Account Payment.', 'error')
+                        return redirect(url_for('customer_bp.process_payment', order_id=order_id))
             else:
                 flash('Invalid payment method.', 'error')
-                return redirect(url_for('customer_bp.process_payment'))
+                return redirect(url_for('customer_bp.process_payment', order_id=order_id))
 
+            # Add the payment record to the session
             if payment:
                 db.session.add(payment)
 
+            # Mark the order as completed
             order.status = 'Completed'
             db.session.commit()
 
@@ -272,9 +289,11 @@ def process_payment(order_id):
         except SQLAlchemyError as e:
             db.session.rollback()
             flash('Payment failed. Details: ' + str(e), 'error')
-            return redirect(url_for('customer_bp.process_payment'))
+            return redirect(url_for('customer_bp.process_payment', order_id=order_id))
 
+    # Render the payment page
     return render_template('customer_process_payment.html', order=order)
+
 
 
 
