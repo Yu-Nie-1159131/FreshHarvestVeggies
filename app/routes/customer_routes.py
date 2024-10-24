@@ -84,11 +84,10 @@ def place_order():
         return redirect('/login')
 
     customer_id = session['customer_id']
-    payment_method = request.form.get('payment_method')
     delivery_method = request.form.get('delivery_method')
     delivery_distance = request.form.get('distance')
 
-    # Check if a delivery distance is provided and can be converted to a float
+   # Verify delivery distance
     if delivery_distance:
         try:
             delivery_distance = float(delivery_distance)
@@ -96,7 +95,7 @@ def place_order():
             flash('Invalid delivery distance.', 'error')
             return redirect(url_for('customer_bp.available_items'))
     else:
-        delivery_distance = 0.0  # Default value
+        delivery_distance = 0.0  # Default distance
 
     items = []
 
@@ -108,9 +107,9 @@ def place_order():
             product_id = request.form.get(f'items[{index}][product_id]')
             quantity = request.form.get(f'items[{index}][quantity]')
             if quantity and float(quantity) > 0:  # Ensure quantity is greater than 0
-                existing_item = next((item for item in items if item['product_id'] == product_id), None)
-                if not existing_item:
-                    items.append({
+               existing_item = next((item for item in items if item['product_id'] == product_id), None)
+               if not existing_item:
+                     items.append({
                         'type': item_type,
                         'product_id': product_id,
                         'quantity': quantity
@@ -120,7 +119,7 @@ def place_order():
         flash('No items in the order.', 'error')
         return redirect(url_for('customer_bp.available_items'))
 
-    # Get current customer
+    # Getting current customer
     customer = Customer.query.get(customer_id)
     if not customer:
         flash('Customer not found.', 'error')
@@ -128,122 +127,156 @@ def place_order():
 
     try:
         total_amount = 0.0
-        discount_rate = 1.0  # Default discount
+        discount_rate = 1.0  # Default rate
 
-        # Check customer type and process order limits
+        # Check customer type and process order restrictions
         if isinstance(customer, CorporateCustomer):
             if customer.min_balance < customer.max_credit:
                 flash('Your balance is lower than the allowed credit limit. Cannot place an order.', 'error')
                 return redirect(url_for('customer_bp.available_items'))
-            discount_rate = 0.9  # Corporate customers get a 10% discount
+            discount_rate = 0.9  # 10% discount for corporate customers
         else:
-            if customer.balance > 100:
-                flash('You owe more than $100. Cannot place an order.', 'error')
+            if customer.balance < -100:
+                flash('Your balance is not enough. Cannot place an order.', 'error')
                 return redirect(url_for('customer_bp.available_items'))
 
-        # Create new order
+        # Create a new order
         new_order = Order(customer_id=customer_id)
         db.session.add(new_order)
-        db.session.flush()  # Ensure order ID is available
+        db.session.flush()  # Ensure the order ID is available
 
         # Process order items and update inventory
         for item in items:
             product_id = item['product_id']
-            quantity = float(item['quantity'])  # Ensure quantity is a float
+            quantity = float(item['quantity'])
             product = None
 
-            # Differentiate product types and find corresponding products
             if item['type'] == 'pack_veggie':
                 product = PackVeggie.query.get(product_id)
-                if product.num_of_packs >= quantity:  # Ensure enough stock
-                    product.num_of_packs -= quantity  # Deduct stock
+                if product.num_of_packs >= quantity:
+                    product.num_of_packs -= quantity
                 else:
                     flash(f'Not enough packs of {product.description} available.', 'error')
                     return redirect(url_for('customer_bp.available_items'))
             elif item['type'] == 'unit_price_veggie':
                 product = UnitPriceVeggie.query.get(product_id)
-                if product.quantity >= quantity:  # Ensure enough stock
-                    product.quantity -= quantity  # Deduct stock
+                if product.quantity >= quantity:
+                    product.quantity -= quantity
                 else:
                     flash(f'Not enough quantity of {product.description} available.', 'error')
                     return redirect(url_for('customer_bp.available_items'))
             elif item['type'] == 'weighted_veggie':
                 product = WeightedVeggie.query.get(product_id)
-                if product.weight >= quantity:  # Ensure enough stock
-                    product.weight -= quantity  # Deduct stock
+                if product.weight >= quantity:
+                    product.weight -= quantity
                 else:
                     flash(f'Not enough weight of {product.description} available.', 'error')
                     return redirect(url_for('customer_bp.available_items'))
             elif item['type'] == 'premade_box':
                 product = PremadeBox.query.get(product_id)
-                if product.num_of_boxes >= quantity:  # Ensure enough stock
-                    product.num_of_boxes -= quantity  # Deduct stock
+                if product.num_of_boxes >= quantity:
+                    product.num_of_boxes -= quantity
                 else:
                     flash(f'Not enough boxes of {product.description} available.', 'error')
                     return redirect(url_for('customer_bp.available_items'))
 
-            # If product found, add to order
             if product:
                 order_item = OrderItem(
                     order_id=new_order.id,
                     product_id=product.id,
                     quantity=quantity,
-                    price=product.price * discount_rate  # Apply discount
+                    price=product.price * discount_rate  # Applying Discounts
                 )
                 db.session.add(order_item)
-
-                # Calculate total amount
                 total_amount += product.price * quantity * discount_rate
 
-        # Handle delivery charges
+        # Handling shipping costs
         if delivery_method == 'delivery':
             if delivery_distance > 20:
                 flash('Delivery is only available within 20 km.', 'error')
                 return redirect(url_for('customer_bp.available_items'))
-            total_amount += 10.00  # Fixed fee
+            total_amount += 10.00  # Fixed delivery fee
 
-        # Update total amount in order
         new_order.total_amount = total_amount
-
-        # Handle payment
-        payment = None  # Initialize payment variable
-        if payment_method == 'Credit Card':
-            payment = CreditCardPayment(
-                payment_date=datetime.now(),
-                amount=total_amount,
-                card_type=request.form.get('card_type'),
-                payment_type=payment_method,
-                card_expiry_date=request.form.get('expiry_date')
-            )
-        elif payment_method == 'Debit Card':
-            payment = DebitCardPayment(
-                payment_date=datetime.now(),
-                amount=total_amount,
-                debit_card_number=request.form.get('debit_card_number'),
-                payment_type=payment_method,
-                bank_name=request.form.get('bank_name')
-            )
-        elif payment_method == 'Account Payment':
-            # Charge to account
-            customer.balance += total_amount
-            db.session.commit()  # Update balance
-        else:
-            flash('Invalid payment method.', 'error')
-            return redirect(url_for('customer_bp.available_items'))
-
-        # Save payment record and commit inventory changes (only if payment method is not Account Payment)
-        if payment:
-            db.session.add(payment)
-
         db.session.commit()
 
-        flash('Order placed successfully!', 'success')  # Success message
+        # Save the order ID for payment processing
+        session['order_id'] = new_order.id
+        flash('Order placed successfully! Please proceed to payment.', 'success')
         return redirect(url_for('customer_bp.available_items'))
 
     except SQLAlchemyError as e:
         db.session.rollback()
         flash('Failed to place order. Details: ' + str(e), 'error')
         return redirect(url_for('customer_bp.available_items'))
+
+
+@customer_bp.route('/process_payment/<int:order_id>', methods=['GET', 'POST'])
+def process_payment(order_id):
+    if 'customer_id' not in session:
+        return redirect('/login')
+
+    # Get the current order
+    order = Order.query.get(order_id)
+    if not order:
+        return "Order not found", 404
+    
+    if not order:
+        flash('Order not found.', 'error')
+        return redirect(url_for('customer_bp.available_items'))
+
+    if request.method == 'POST':
+        payment_method = request.form.get('payment_method')
+
+        try:
+            payment = None
+            total_amount = order.total_amount
+
+            if payment_method == 'Credit Card':
+                payment = CreditCardPayment(
+                    payment_date=datetime.now(),
+                    amount=total_amount,
+                    card_type=request.form.get('card_type'),
+                    payment_type=payment_method,
+                    card_expiry_date=request.form.get('expiry_date')
+                )
+            elif payment_method == 'Debit Card':
+                payment = DebitCardPayment(
+                    payment_date=datetime.now(),
+                    amount=total_amount,
+                    debit_card_number=request.form.get('debit_card_number'),
+                    payment_type=payment_method,
+                    bank_name=request.form.get('bank_name')
+                )
+            elif payment_method == 'Account Payment':
+                customer = Customer.query.get(order.customer_id)
+                if customer.balance >= total_amount:
+                    customer.balance -= total_amount  # Deduct from account balance
+                    db.session.commit()  # Update balance
+                else:
+                    flash('Insufficient balance for Account Payment.', 'error')
+                    return redirect(url_for('customer_bp.process_payment'))
+            else:
+                flash('Invalid payment method.', 'error')
+                return redirect(url_for('customer_bp.process_payment'))
+
+            if payment:
+                db.session.add(payment)
+
+            order.status = 'Completed'
+            db.session.commit()
+
+            flash('Payment successful and order completed!', 'success')
+            return redirect(url_for('customer_bp.available_items'))
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash('Payment failed. Details: ' + str(e), 'error')
+            return redirect(url_for('customer_bp.process_payment'))
+
+    return render_template('customer_process_payment.html', order=order)
+
+
 
 
 
@@ -257,16 +290,40 @@ def current_order():
 
     customer_id = session['customer_id']
     
-    # Query current orders
+    # Query the current order
     current_order = Order.query.filter_by(customer_id=customer_id, status='Pending').order_by(Order.id.desc()).first()
     
     if request.method == 'POST':
-        # Cancel order
+        # Check if the order exists
         if current_order:
             try:
+                # Get the order items associated with the current order
+                order_items = db.session.query(OrderItem).filter(OrderItem.order_id == current_order.id).all()
+
+                for order_item in order_items:
+                    
+                    weightedV = db.session.query(WeightedVeggie).filter(WeightedVeggie.id == order_item.product_id).first()
+                    packV = db.session.query(PackVeggie).filter(PackVeggie.id == order_item.product_id).first()
+                    premadeBox = db.session.query(PremadeBox).filter(PremadeBox.id == order_item.product_id).first()
+                    unitPriceV = db.session.query(UnitPriceVeggie).filter(UnitPriceVeggie.id == order_item.product_id).first()
+
+                    # Restore the inventory based on the item type
+                    if weightedV is not None:
+                        weightedV.weight += order_item.quantity  # Restore weight
+                    if packV is not None:
+                        packV.num_of_packs += order_item.quantity  # Restore number of packs
+                    if unitPriceV is not None:
+                        unitPriceV.quantity += order_item.quantity  # Restore quantity
+                    if premadeBox is not None:
+                        premadeBox.num_of_boxes += order_item.quantity  # Restore number of boxes
+
+                # Cancel the order
                 current_order.status = 'Cancelled'
+
+                # Commit changes
                 db.session.commit()
-                return render_template('customer_current_order.html', order=None, message='Order has been cancelled.')
+
+                return render_template('customer_current_order.html', order=None, message='Order has been cancelled, and the stock has been updated.')
             except Exception as e:
                 db.session.rollback()
                 return render_template('customer_current_order.html', order=current_order, message='Failed to cancel the order: ' + str(e))
@@ -274,7 +331,7 @@ def current_order():
     if current_order is None:
         return render_template('customer_current_order.html', message='No current orders found.')
 
-    # Query order items with corresponding item descriptions
+    # Query order items and corresponding product descriptions
     order_items = (
         db.session.query(OrderItem, Item)
         .join(Item, OrderItem.product_id == Item.id)
@@ -282,9 +339,8 @@ def current_order():
         .all()
     )
 
-    # Pass the items with descriptions to the template
+    # Pass order and product description to the template
     return render_template('customer_current_order.html', order=current_order, items=order_items)
-
 
 #6. View previous order details.
 @customer_bp.route('/previous_orders', methods=['GET'])
@@ -336,7 +392,7 @@ def view_profile():
 @customer_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # 获取表单数据
+        # Get form data
         customer_type = request.form['customer_type']
         username = request.form['username']
         first_name = request.form['first_name']
@@ -345,22 +401,22 @@ def register():
         address = request.form['address']
         max_owing = request.form['max_owing']
         
-        # 企业客户的额外字段
+        # Additional fields for enterprise customers
         min_balance = request.form.get('min_balance')
         max_credit = request.form.get('max_credit')
         discount_rate = 0.9
 
-        # 检查用户名是否已存在
+        # Check if the username already exists
         existing_customer = Customer.query.filter_by(username=username).first()
         if existing_customer:
             flash('Username already exists, please choose a different one.', 'error')
             return redirect(url_for('customer_bp.register'))
 
-        # 加密密码
+        # Encrypted password
         hashed_password = hashing.hash_value(password, salt='neal')
 
         try:
-            # 根据客户类型创建私人客户或企业客户
+            # Create private customers or corporate customers based on customer type
             if customer_type == 'private':
                 new_customer = Customer(
                     username=username,
@@ -369,7 +425,7 @@ def register():
                     password=hashed_password,
                     cust_address=address,
                     max_owing=max_owing,
-                    balance=0  # 初始余额为0
+                    balance=0  # Initial balance is 0
                 )
             elif customer_type == 'corporate':
                 new_customer = CorporateCustomer(
@@ -379,13 +435,13 @@ def register():
                     password=hashed_password,
                     cust_address=address,
                     max_owing=max_owing,
-                    balance=0,  # 初始余额为0
+                    balance=0,  # Initial balance is 0
                     min_balance=min_balance,
                     max_credit=max_credit,
                     discount_rate=discount_rate
                 )
 
-            # 保存到数据库
+            # Save to database
             db.session.add(new_customer)
             db.session.commit()
 

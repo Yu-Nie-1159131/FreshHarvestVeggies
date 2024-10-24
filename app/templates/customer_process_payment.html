@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Payment</title>
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 800px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .message {
+            font-size: 16px;
+            color: red;
+            margin-bottom: 20px;
+            display: none; /* Initially hidden */
+        }
+        .form-control {
+            margin-bottom: 15px;
+        }
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        li {
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            margin-top: 20px;
+            width: 100%;
+        }
+        #credit_card_details, #debit_card_details {
+            display: none;
+        }
+        .btn-back {
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            text-align: center;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .flashed-messages {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .flashed-messages li {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+        }
+        
+        .success {
+            background-color: green;
+        }
+        
+        .error {
+            background-color: red;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Process Payment for Order #{{ order.id }}</h1>
+
+        <!-- Display order total -->
+        <div class="order-summary">
+            <p><strong>Order Total: ${{ order.total_amount }}</strong></p>
+        </div>
+
+        <!-- Payment Form -->
+        <form method="POST" action="{{ url_for('customer_bp.process_payment') }}">
+            <label for="payment_method">Choose Payment Method:</label>
+            <select name="payment_method" id="payment_method" required>
+                <option value="" disabled selected>Select a payment method</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Account Payment">Account Payment</option>
+            </select>
+
+            <!-- Credit Card Payment -->
+            <div id="credit_card_payment" class="payment-details" style="display:none;">
+                <h3>Credit Card Payment</h3>
+                <label for="card_type">Card Type:</label>
+                <input type="text" name="card_type" id="card_type" placeholder="e.g. Visa, MasterCard" required>
+
+                <label for="expiry_date">Expiry Date:</label>
+                <input type="text" name="expiry_date" id="expiry_date" placeholder="MM/YY" required>
+            </div>
+
+            <!-- Debit Card Payment -->
+            <div id="debit_card_payment" class="payment-details" style="display:none;">
+                <h3>Debit Card Payment</h3>
+                <label for="debit_card_number">Debit Card Number:</label>
+                <input type="text" name="debit_card_number" id="debit_card_number" placeholder="Enter your debit card number" required>
+
+                <label for="bank_name">Bank Name:</label>
+                <input type="text" name="bank_name" id="bank_name" placeholder="Enter your bank name" required>
+            </div>
+
+            <!-- Account Payment -->
+            <div id="account_payment" class="payment-details" style="display:none;">
+                <h3>Account Payment</h3>
+                <p>Your balance will be used to complete the payment.</p>
+            </div>
+
+            <button type="submit">Submit Payment</button>
+        </form>
+
+        <a href="{{ url_for('customer_bp.available_items') }}">Back to Available Items</a>
+    </div>
+
+    <script>
+        // JavaScript to handle showing/hiding payment details based on the selected method
+        document.getElementById('payment_method').addEventListener('change', function () {
+            var selectedMethod = this.value;
+            document.querySelectorAll('.payment-details').forEach(function (element) {
+                element.style.display = 'none';
+            });
+
+            if (selectedMethod === 'Credit Card') {
+                document.getElementById('credit_card_payment').style.display = 'block';
+            } else if (selectedMethod === 'Debit Card') {
+                document.getElementById('debit_card_payment').style.display = 'block';
+            } else if (selectedMethod === 'Account Payment') {
+                document.getElementById('account_payment').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

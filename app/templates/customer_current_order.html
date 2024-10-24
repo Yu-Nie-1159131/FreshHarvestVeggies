@@ -85,6 +85,14 @@
         .back-button:hover {
             background-color: #0069d9; /* Darker blue on hover */
         }
+
+        .payment-button {
+            background-color: #28a745; /* Green color for the payment button */
+        }
+
+        .payment-button:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
     </style>
 </head>
 <body>
@@ -116,6 +124,11 @@
         
         <form method="POST" action="/current_order">
             <button type="submit">Cancel Order</button>
+        </form>
+
+        <!-- Payment Button -->
+        <form method="POST" action="/processpayment">
+            <button type="submit" class="payment-button">Proceed to Payment</button>
         </form>
 
         <!-- Back to Home button -->

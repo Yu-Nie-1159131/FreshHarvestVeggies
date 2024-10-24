@@ -187,20 +187,33 @@ def get_sales_summary():
     nz_timezone = pytz.timezone('Pacific/Auckland')
     now = datetime.now(nz_timezone)
 
-    # Calculate sales for a week
+    # Calculate sales for a week (only completed orders)
     week_start = now - timedelta(days=7)
-    week_sales = db.session.query(func.sum(Order.total_amount)).filter(Order.order_date >= week_start).scalar() or 0.0
+    week_sales = (
+        db.session.query(func.sum(Order.total_amount))
+        .filter(Order.order_date >= week_start, Order.status == 'completed')
+        .scalar() or 0.0
+    )
 
-    # Calculate sales for a month
+    # Calculate sales for a month (only completed orders)
     month_start = now - timedelta(days=30)
-    month_sales = db.session.query(func.sum(Order.total_amount)).filter(Order.order_date >= month_start).scalar() or 0.0
+    month_sales = (
+        db.session.query(func.sum(Order.total_amount))
+        .filter(Order.order_date >= month_start, Order.status == 'completed')
+        .scalar() or 0.0
+    )
 
-    # Calculate sales for one year
+    # Calculate sales for one year (only completed orders)
     year_start = now - timedelta(days=365)
-    year_sales = db.session.query(func.sum(Order.total_amount)).filter(Order.order_date >= year_start).scalar() or 0.0
+    year_sales = (
+        db.session.query(func.sum(Order.total_amount))
+        .filter(Order.order_date >= year_start, Order.status == 'completed')
+        .scalar() or 0.0
+    )
 
     # Pass the sales amount to the template
     return render_template('staff_sales_summary.html', week_sales=week_sales, month_sales=month_sales, year_sales=year_sales)
+
 
 # 9. Check out the most popular items
 @staff_bp.route('/staff/popular_items', methods=['GET'])
@@ -358,7 +371,7 @@ def process_payment(order_id):
     elif payment_method == 'Account Payment':
        # If it is an account payment, update the customer balance
         customer = Customer.query.get(order.customer_id)
-        customer.balance += total_amount  # Balance increases
+        customer.balance -= total_amount  # Balance decreases
         payment_type = payment_method 
 
     else:

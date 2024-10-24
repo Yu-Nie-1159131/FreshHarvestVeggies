@@ -13,7 +13,7 @@ VALUES
 INSERT INTO customer (id, cust_address, max_owing, balance)
 VALUES 
 (1, '123 Main St', 1000.00, 0),
-(2, '456 Oak St', 500.00, 50.00),
+(2, '456 Oak St', 500.00, 201.00),
 (3, '789 Pine St', 1500.00, 30.00),
 (4, 'Corporate Address', 10000.00, 0);
 
@@ -31,31 +31,51 @@ VALUES
 
 
 -- Items
--- Step 1: 插入数据到 item 表
 INSERT INTO item (description, price) VALUES 
 ('Carrot Pack', 5.00), 
 ('Tomato by Unit', 0.80), 
 ('Potato by Weight', 2.50), 
-('Premade Box - Large', 20.00);
+('Premade Box - Middle', 20.00),
+('Lettuce Pack', 4.50), 
+('Cucumber by Unit', 1.00), 
+('Pumpkin by Weight', 1.80), 
+('Premade Box - Small', 15.00),
+('Broccoli Pack', 6.00),
+('Eggplant by Unit', 1.50),
+('Zucchini by Weight', 2.20),
+('Premade Box - Large', 30.00);
 
--- Step 2: 插入数据到 veggie 表
+-- Veggie class
 INSERT INTO veggie (id, weight_per_kilo) VALUES 
-(1, 1.5), -- Carrot Pack
-(2, 0.5), -- Tomato by Unit
-(3, 2.0); -- Potato by Weight
+(1, 1.5),  -- Carrot Pack
+(2, 0.5),  -- Tomato by Unit
+(3, 2.0),  -- Potato by Weight
+(5, 1.2),  -- Lettuce Pack
+(6, 0.6),  -- Cucumber by Unit
+(7, 3.0),  -- Pumpkin by Weight
+(9, 1.0),  -- Broccoli Pack
+(10, 0.8), -- Eggplant by Unit
+(11, 2.5); -- Zucchini by Weight
 
--- Step 3: 插入数据到 pack_veggie 表 (继承自 veggie)
+-- PackVeggie class, ensure ids correspond to veggie ids
 INSERT INTO pack_veggie (id, price_per_pack, num_of_packs, veg_name) VALUES 
-(1, 5.00, 10, 'Carrot Pack');
+(1, 5.00, 10, 'Carrot Pack'),  -- This corresponds to id=1 in veggie
+(5, 4.50, 15, 'Lettuce Pack'),  -- This corresponds to id=5 in veggie
+(9, 6.00, 20, 'Broccoli Pack'); -- This corresponds to id=9 in veggie
 
--- Step 4: 插入数据到 unit_price_veggie 表 (继承自 veggie)
+-- Other categories
 INSERT INTO unit_price_veggie (id, price_per_unit, quantity) VALUES 
-(2, 0.80, 50); -- Tomato by Unit
+(2, 0.80, 50), -- Tomato by Unit
+(6, 1.00, 100), -- Cucumber by Unit
+(10, 1.50, 60);  -- Eggplant by Unit
 
--- Step 5: 插入数据到 weighted_veggie 表 (继承自 veggie)
 INSERT INTO weighted_veggie (id, weight) VALUES 
-(3, 20.0); -- Potato by Weight
+(3, 20.0),  -- Potato by Weight
+(7, 50.0),  -- Pumpkin by Weight
+(11, 30.0);  -- Zucchini by Weight
 
--- Step 6: 插入数据到 premade_box 表 (继承自 item)
 INSERT INTO premade_box (id, box_size, num_of_boxes) VALUES 
-(4, 'Large', 5); -- Premade Box - Large
+(4, 'Middle', 5),    -- Premade Box - Middle
+(8, 'Small', 8),     -- Premade Box - Small
+(12, 'Large', 3);    -- Premade Box - Large
+
