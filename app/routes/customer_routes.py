@@ -137,7 +137,7 @@ def place_order():
                 return redirect(url_for('customer_bp.available_items'))
             discount_rate = 0.9  # 10% discount for corporate customers
         else:
-            if customer.balance < -100:
+            if customer.balance < 0:
                 flash('Your balance is not enough. Cannot place an order.', 'error')
                 return redirect(url_for('customer_bp.available_items'))
 
@@ -197,7 +197,11 @@ def place_order():
                 flash('Delivery is only available within 20 km.', 'error')
                 return redirect(url_for('customer_bp.available_items'))
             total_amount += 10.00  # Fixed delivery fee
-
+        
+        # if customer order more items than max owning, then return an error
+        if co_Customer is None and total_amount > customer.max_owing:
+            flash('Your order amount is over your max owning. Cannot place an order.', 'error')
+            return redirect(url_for('customer_bp.available_items'))
         new_order.total_amount = total_amount
         db.session.commit()
 
@@ -418,7 +422,7 @@ def register():
         last_name = request.form['last_name']
         password = request.form['password']
         address = request.form['address']
-        max_owing = request.form['max_owing']
+        balance = request.form['balance']
         
         # Additional fields for enterprise customers
         min_balance = request.form.get('min_balance')
@@ -443,8 +447,8 @@ def register():
                     last_name=last_name,
                     password=hashed_password,
                     cust_address=address,
-                    max_owing=max_owing,
-                    balance=0  # Initial balance is 0
+                    max_owing=100, # Initial max owning is 0
+                    balance=balance  
                 )
             elif customer_type == 'corporate':
                 new_customer = CorporateCustomer(
@@ -453,8 +457,8 @@ def register():
                     last_name=last_name,
                     password=hashed_password,
                     cust_address=address,
-                    max_owing=max_owing,
-                    balance=0,  # Initial balance is 0
+                    max_owing=100, # Initial max owning is 0
+                    balance=balance,  
                     min_balance=min_balance,
                     max_credit=max_credit,
                     discount_rate=discount_rate
