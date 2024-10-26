@@ -56,7 +56,12 @@ flask db upgrade
 # Usage
 Start the server: After setting up and deploying the server, you can access the application at http://localhost:5000.
 
-You can use : ( python run.py ) to start the server
+You can use : 
+
+```bash
+python run.py  
+ ```
+ to start the server
 
 Endpoints include:
 /customer: For finishing customer functions.
@@ -86,3 +91,11 @@ password: test002
 
 Username: staff_user
 Password: test002
+
+# Testing
+The project uses pytest for testing. Tests are located in the `tests` directory.
+
+## Running Tests
+To run all tests:
+```bash
+python -m pytest -v -s
