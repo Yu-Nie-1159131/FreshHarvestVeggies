@@ -14,7 +14,7 @@ INSERT INTO customer (id, cust_address, max_owing, balance)
 VALUES 
 (1, '123 Main St', 100.00, 0),
 (2, '456 Oak St', 100.00, 201.00),
-(3, '789 Pine St', 100.00, 30.00),
+(3, '789 Pine St', 100.00, 100.00),
 (4, 'Corporate Address', 100.00, 0);
 
 

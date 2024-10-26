@@ -198,10 +198,11 @@ def place_order():
                 return redirect(url_for('customer_bp.available_items'))
             total_amount += 10.00  # Fixed delivery fee
         
-        # if customer order more items than max owning, then return an error
+        # if customer order more items than max owning, then return an error.
         if co_Customer is None and total_amount > customer.max_owing:
             flash('Your order amount is over your max owning. Cannot place an order.', 'error')
             return redirect(url_for('customer_bp.available_items'))
+        
         new_order.total_amount = total_amount
         db.session.commit()
 
