@@ -137,7 +137,7 @@ def place_order():
                 return redirect(url_for('customer_bp.available_items'))
             discount_rate = 0.9  # 10% discount for corporate customers
         else:
-            if customer.balance < 0:
+            if customer.balance <= 0:
                 flash('Your balance is not enough. Cannot place an order.', 'error')
                 return redirect(url_for('customer_bp.available_items'))
 
