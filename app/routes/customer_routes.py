@@ -142,7 +142,7 @@ def place_order():
                 return redirect(url_for('customer_bp.available_items'))
 
         # Create a new order
-        new_order = Order(customer_id=customer_id)
+        new_order = Order(customer_id=customer_id,total_amount=0.0)
         db.session.add(new_order)
         db.session.flush()  # Ensure the order ID is available
 
